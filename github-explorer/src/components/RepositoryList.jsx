@@ -1,34 +1,32 @@
-import { RepositoryItem } from "./RepositoryItem";
+import { useState, useEffect } from 'react';
+import { RepositoryItem } from './RepositoryItem';
+
+import '../styles/repositories.scss';
 
 export function RepositoryList() {
+  const [repositories, setRepositories] = useState([]);
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/Luanfv/repos')
+      .then((response) => response.json())
+      .then((data) => setRepositories(data));
+  }, []);
+
   return (
-    <section class="repository-list">
+    <section className="repository-list">
       <h1>Lista</h1>
 
       <ul>
-        <RepositoryItem
-          repository={{
-            name: 'teste',
-            description: 'lorem ipsum',
-            link: 'https://github.com',
-          }}
-        />
-
-        <RepositoryItem
-          repository={{
-            name: 'batata',
-            description: 'lorem ipsum',
-            link: 'https://github.com',
-          }}
-        />
-
-        <RepositoryItem
-          repository={{
-            name: 'feijão',
-            description: 'lorem ipsum',
-            link: 'https://github.com',
-          }}
-        />
+        {repositories.map((repository) => (
+          <RepositoryItem
+            key={repository.id}
+            repository={{
+              name: repository.name,
+              description: repository.description,
+              link: repository.html_url,
+            }}
+          />
+        ))}
       </ul>
     </section>
   )
