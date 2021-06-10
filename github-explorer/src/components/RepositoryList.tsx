@@ -3,8 +3,14 @@ import { RepositoryItem } from './RepositoryItem';
 
 import '../styles/repositories.scss';
 
+interface IRepository {
+  name: String;
+  description: String;
+  html_url: String;
+}
+
 export function RepositoryList() {
-  const [repositories, setRepositories] = useState([]);
+  const [repositories, setRepositories] = useState<IRepository[]>([]);
 
   useEffect(() => {
     fetch('https://api.github.com/users/Luanfv/repos')
@@ -19,11 +25,11 @@ export function RepositoryList() {
       <ul>
         {repositories.map((repository) => (
           <RepositoryItem
-            key={repository.id}
+            key={String(repository.name)}
             repository={{
               name: repository.name,
               description: repository.description,
-              link: repository.html_url,
+              html_url: repository.html_url,
             }}
           />
         ))}
