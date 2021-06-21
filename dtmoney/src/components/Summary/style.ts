@@ -25,5 +25,10 @@ export const Container = styled.div`
       font-weight: 500;
       line-height: 3rem;
     }
+
+    &.deposit {
+      background-color: var(--green);
+      color: #fff;
+    }
   }
 `;
