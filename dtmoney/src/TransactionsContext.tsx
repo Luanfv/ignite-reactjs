@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { api } from './services/api';
 
 interface ITransaction {
@@ -18,6 +18,9 @@ interface ITransactionsProviderProps {
 
 interface ITransactionsContextData {
   transactions: ITransaction[];
+  totalDeposits: Number;
+  totalWithdraws: Number;
+  total: Number;
   createTransaction: (transaction: ITransactionInput) => Promise<Boolean>;
 }
 
@@ -26,11 +29,33 @@ export const TransactionsContext = createContext<ITransactionsContextData>({} as
 export const TransactionsProvider = ({ children }: ITransactionsProviderProps) => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
 
+  const totalDeposits = useMemo(() => (
+    transactions.reduce((acc, transaction) => {
+      if (transaction.type === 'deposit') {
+        return acc + Number(transaction.amount);
+      }
+
+      return acc;
+    }, 0)),
+    [transactions]
+  );
+
+  const totalWithdraws = useMemo(() => (
+    transactions.reduce((acc, transaction) => {
+      if (transaction.type === 'withdraw') {
+        return acc + Number(transaction.amount);
+      }
+
+      return acc;
+    }, 0)),
+    [transactions]
+  );
+
+  const total = useMemo(() => totalDeposits - totalWithdraws, [totalDeposits, totalWithdraws]);
+
   const createTransaction = useCallback(async (transaction: ITransactionInput) => {
     try {
       const response = await api.post('/transactions', transaction);
-
-      console.log(response.data);
 
       setTransactions([...transactions, response.data.transactions]);
 
@@ -48,6 +73,9 @@ export const TransactionsProvider = ({ children }: ITransactionsProviderProps) =
   return (
     <TransactionsContext.Provider value={{
       transactions,
+      totalDeposits,
+      totalWithdraws,
+      total,
       createTransaction,
     }}>
       {children}

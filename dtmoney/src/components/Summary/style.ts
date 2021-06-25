@@ -30,5 +30,10 @@ export const Container = styled.div`
       background-color: var(--green);
       color: #fff;
     }
+
+    &.withdraw {
+      background-color: var(--red);
+      color: #fff;
+    }
   }
 `;
