@@ -1,7 +1,5 @@
 import Head from 'next/head';
 
-import styles from '../styles/home.module.scss';
-
 function Home() {
   return (
     <>
@@ -11,8 +9,8 @@ function Home() {
         </title>
       </Head>
 
-      <h1 className={styles.title}>
-        Hello <span>world</span>!
+      <h1>
+        Hello world!
       </h1>
     </>
   );
