@@ -1,7 +1,11 @@
+import { GetStaticProps } from 'next';
 import Head from 'next/head';
+import Prismic from '@prismicio/client';
+
+import { getPrismicClient } from '../../services/prismic';
 import styles from './styles.module.scss';
 
-export default function Posts() {
+export default function Posts({ posts }) {
   return (
     <>
       <Head>
@@ -10,26 +14,34 @@ export default function Posts() {
 
       <main className={styles.container}>
         <div className={styles.posts}>
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>title</strong>
-            <p>lorem ipsum</p>
-          </a>
-
-
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>title</strong>
-            <p>lorem ipsum</p>
-          </a>
-
-          <a href="#">
-            <time>12 de março de 2021</time>
-            <strong>title</strong>
-            <p>lorem ipsum</p>
-          </a>
+          {posts.results.map((post) => {
+            return (
+              <a href="#" key={post.id}>
+                <time>{post.first_publication_date}</time>
+                <strong>{post.data.title[0].text}</strong>
+                <p>{post.data.content[0].text}</p>
+              </a>
+            );
+          })}
         </div>
       </main>
     </>
   );
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+
+  const response = await prismic.query([
+    Prismic.predicates.at('document.type', 'post'),
+  ], {
+    fetch: ['post.title', 'post.content'],
+    pageSize: 100,
+  });
+
+  return {
+    props: {
+      posts: response,
+    },
+  };
 }
