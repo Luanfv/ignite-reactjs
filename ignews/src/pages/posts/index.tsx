@@ -1,11 +1,23 @@
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Prismic from '@prismicio/client';
+import { RichText } from 'prismic-dom';
 
 import { getPrismicClient } from '../../services/prismic';
 import styles from './styles.module.scss';
 
-export default function Posts({ posts }) {
+type IPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  updatedAt: string;
+};
+
+interface IPostsProps {
+  posts: IPost[],
+}
+
+export default function Posts({ posts }: IPostsProps) {
   return (
     <>
       <Head>
@@ -14,12 +26,12 @@ export default function Posts({ posts }) {
 
       <main className={styles.container}>
         <div className={styles.posts}>
-          {posts.results.map((post) => {
+          {posts.map((post) => {
             return (
-              <a href="#" key={post.id}>
-                <time>{post.first_publication_date}</time>
-                <strong>{post.data.title[0].text}</strong>
-                <p>{post.data.content[0].text}</p>
+              <a href="#" key={post.slug}>
+                <time>{post.updatedAt}</time>
+                <strong>{post.title}</strong>
+                <p>{post.excerpt}</p>
               </a>
             );
           })}
@@ -39,9 +51,22 @@ export const getStaticProps: GetStaticProps = async () => {
     pageSize: 100,
   });
 
+  const posts = response.results.map((post) => {
+    return {
+      slug: post.uid,
+      title: RichText.asText(post.data.title),
+      excerpt: post.data.content.find((content) => content.type === 'paragraph')?.text ?? '',
+      updatedAt: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }),
+    };
+  });
+
   return {
     props: {
-      posts: response,
+      posts,
     },
   };
 }
