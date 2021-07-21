@@ -39,7 +39,7 @@ export function SubscribeButton({ priceId }: ISubscribeButtonProps) {
     } catch (err) {
       alert(err.message);
     }
-  }, [session]);
+  }, [router, session]);
 
   return (
     <button
