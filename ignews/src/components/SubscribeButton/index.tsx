@@ -4,6 +4,7 @@ import { useSession, signIn } from 'next-auth/client';
 import styles from './styles.module.scss'
 import { api } from '../../services/api';
 import { getStripeJs } from '../../services/stripe-js';
+import { useRouter } from 'next/router';
 
 interface ISubscribeButtonProps {
   priceId: String;
@@ -11,6 +12,7 @@ interface ISubscribeButtonProps {
 
 export function SubscribeButton({ priceId }: ISubscribeButtonProps) {
   const [session] = useSession();
+  const router = useRouter();
 
   const handleSubscribe = useCallback(async () => {
     if (!session) {
@@ -18,6 +20,13 @@ export function SubscribeButton({ priceId }: ISubscribeButtonProps) {
 
       return;
     }
+
+    if (session.activeSubscription) {
+      router.push('/posts');
+
+      return;
+    }
+
 
     try {
       const response = await api.post('/subscribe');
