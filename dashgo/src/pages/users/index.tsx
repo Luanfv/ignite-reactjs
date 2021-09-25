@@ -17,22 +17,15 @@ import {
   Spinner,
 } from '@chakra-ui/react';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
-import { useQuery } from 'react-query';
 
-import { api } from '../../services/api';
+import { useUsers } from '../../services/hooks/useUsers';
 
 import { Header } from '../../components/Header';
 import { Pagination } from '../../components/Pagination';
 import { Sidebar } from '../../components/Sidebar';
 
 export default function UserList() {
-  const { data, isLoading, error, isFetching } = useQuery('users', async () => {
-    const response = await api.get('/users');
-
-    return response.data;
-  }, {
-    staleTime: 1000 *  5,
-  });
+  const { data, isLoading, error, isFetching } = useUsers();
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -108,7 +101,7 @@ export default function UserList() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data.users.map((user: any, index: number) => (
+                  {data && data.map((user: any, index: number) => (
                     <Tr key={index}>
                       <Td px={['4', '4', '6']}>
                         <Checkbox colorScheme="pink" />
@@ -122,11 +115,7 @@ export default function UserList() {
 
                       {isWideVersion && (
                         <Td>
-                          {new Date(user.createdAt).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'long',
-                            year: 'numeric',
-                          })}
+                          {user.createdAt}
                         </Td>
                       )}
 
