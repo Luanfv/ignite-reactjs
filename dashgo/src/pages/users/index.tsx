@@ -19,16 +19,17 @@ import {
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { useQuery } from 'react-query';
 
+import { api } from '../../services/api';
+
 import { Header } from '../../components/Header';
 import { Pagination } from '../../components/Pagination';
 import { Sidebar } from '../../components/Sidebar';
 
 export default function UserList() {
-  const { data, isLoading, error } = useQuery('users', async () => {
-    const response = await fetch('http://localhost:3000/api/users');
-    const data = response.json();
+  const { data, isLoading, error, isFetching } = useQuery('users', async () => {
+    const response = await api.get('/users');
 
-    return data;
+    return response.data;
   }, {
     staleTime: 1000 *  5,
   });
@@ -67,6 +68,9 @@ export default function UserList() {
               fontWeight="normal"
             >
               Usuários
+              {!isLoading && isFetching && (
+                <Spinner size="sm" color="gray.500" marginLeft="4" />
+              )}
             </Heading>
 
             <Link href="/users/create" passHref>
