@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import NextLink from 'next/link';
 import {
   Box,
   Button,
@@ -24,6 +25,8 @@ import { useUsers } from '../../services/hooks/useUsers';
 import { Header } from '../../components/Header';
 import { Pagination } from '../../components/Pagination';
 import { Sidebar } from '../../components/Sidebar';
+import { api } from '../../services/api';
+import { queryClient } from '../queryClient';
 
 export default function UserList() {
   const [page, setPage] = useState(1);
@@ -33,6 +36,21 @@ export default function UserList() {
     base: false,
     lg: true,
   });
+
+  const handlePrefetchUser = useCallback(async (userId: number) => {
+    await queryClient
+      .prefetchQuery(
+        ['user', userId],
+          async () => {
+          const response = await api.get(`users/${userId}`);
+
+          return response.data;
+        },
+        {
+          staleTime: 1000 * 60,
+        }
+      );
+  }, []);
 
   return (
     <Box>
@@ -110,7 +128,9 @@ export default function UserList() {
                       </Td>
                       <Td>
                         <Box>
-                          <Text fontWeight="bold">{user.name}</Text>
+                          <Link color="purple.400" onMouseEnter={() => handlePrefetchUser(Number(user.id))}>
+                            <Text fontWeight="bold">{user.name}</Text>
+                          </Link>
                           <Text fontSize="small" color="gray.300">{user.email}</Text>
                         </Box>
                       </Td>
