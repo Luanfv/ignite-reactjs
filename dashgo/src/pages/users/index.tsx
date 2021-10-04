@@ -37,7 +37,7 @@ export default function UserList() {
     lg: true,
   });
 
-  const handlePrefetchUser = useCallback(async (userId: number) => {
+  const handlePrefetchUser = useCallback(async (userId: string) => {
     await queryClient
       .prefetchQuery(
         ['user', userId],
@@ -128,7 +128,7 @@ export default function UserList() {
                       </Td>
                       <Td>
                         <Box>
-                          <Link color="purple.400" onMouseEnter={() => handlePrefetchUser(Number(user.id))}>
+                          <Link color="purple.400" onMouseEnter={() => handlePrefetchUser(user.id)}>
                             <Text fontWeight="bold">{user.name}</Text>
                           </Link>
                           <Text fontSize="small" color="gray.300">{user.email}</Text>
